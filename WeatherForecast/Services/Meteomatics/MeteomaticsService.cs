@@ -49,9 +49,10 @@ public class MeteomaticsService : IWeatherGetterService
     {
         var plainTextBytes = System.Text.Encoding.UTF8.GetBytes($"{_options.Login}:{_options.Password}");
         var encodedAuthParams =  Convert.ToBase64String(plainTextBytes);
-        
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {encodedAuthParams}");
-        var tokenResponse = await _httpClient.GetStringAsync(_options.TokenUrl);
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("Authorization", $"Basic {encodedAuthParams}");
+        var tokenResponse = await client.GetStringAsync(_options.TokenUrl);
         return JsonSerializer.Deserialize<TokenResponse>(tokenResponse)?.Token;
     }
 }
